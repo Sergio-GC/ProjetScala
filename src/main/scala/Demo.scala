@@ -5,7 +5,25 @@ import java.io.File
 import java.util.Date
 import java.text.SimpleDateFormat
 
-class Doggo(
+// Define traits or abstract classes for common properties
+trait Animal {
+  def id: Int
+  def name: String
+  def age: Double
+}
+
+trait Pet {
+  def color: String
+}
+
+trait Dog {
+  def breed: String
+  def size: String
+  def coat: String
+}
+
+// Create case classes representing the main data elements
+case class Doggo(
     val id: Int,
     val name: String,
     val age: Double,
@@ -25,7 +43,36 @@ class Doggo(
     val getAlongFemales: Boolean,
     val getAlongCats: Boolean,
     val keepIn: String //TODO external table
-)
+) extends Animal with Pet with Dog
+
+object Doggo {
+  def apply(row: Map[String, String], dateFormat: SimpleDateFormat): Doggo = {
+    val id = row("ID").toInt
+    val name = row("name")
+    val age = row("age").toDouble
+    val sex = row("sex")
+    val breed = row("breed")
+    val dateFound = dateFormat.parse(row("date_found"))
+    val adoptableFrom = dateFormat.parse(row("adoptable_from"))
+    val posted = dateFormat.parse(row("posted"))
+    val color = row("color")
+    val coat = row("coat")
+    val size = row("size")
+    val neutered = row("neutered").equals("yes")
+    val housebroken = row("housebroken").equals("yes")
+    val likesPeople = row("likes_people").equals("yes")
+    val likesChildren = row("likes_children").equals("yes")
+    val getAlongMales = row("get_along_males").equals("yes")
+    val getAlongFemales = row("get_along_females").equals("yes")
+    val getAlongCats = row("get_along_cats").equals("yes")
+    val keepIn = row("keep_in")
+    
+    Doggo(
+      id, name, age, sex, breed, dateFound, adoptableFrom, posted, color, coat, size,
+      neutered, housebroken, likesPeople, likesChildren, getAlongMales, getAlongFemales, getAlongCats, keepIn
+    )
+  }
+}
 
 @main def loadData() = {
     val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
@@ -39,50 +86,35 @@ class Doggo(
 
     val doggos: List[Doggo] = data.map{row => 
         val dogValues: Map[String, String] = header.zip(row).toMap
-        val dateFound = dateFormat.parse(dogValues("date_found"))
-        val adoptableFrom = dateFormat.parse(dogValues("adoptable_from"))
-        val posted = dateFormat.parse(dogValues("posted"))
-
-        val neutered = dogValues("neutered").equals("yes")
-        val housebroken = dogValues("housebroken").equals("yes")
-        val likes_people = dogValues("likes_people").equals("yes")
-        val likes_children = dogValues("likes_children").equals("yes")
-        val get_along_males = dogValues("get_along_males").equals("yes")
-        val get_along_females = dogValues("get_along_females").equals("yes")
-        val get_along_cats = dogValues("get_along_cats").equals("yes")
-
-        Doggo(
-            dogValues("ID").toInt,
-            dogValues("name"),
-            dogValues("age").toDouble,
-            dogValues("sex"),
-            dogValues("breed"),
-            dateFound,
-            adoptableFrom,
-            posted,
-            dogValues("color"),
-            dogValues("coat"),
-            dogValues("size"),
-            neutered,
-            housebroken,
-            likes_people,
-            likes_children,
-            get_along_males,
-            get_along_females,
-            get_along_cats,
-            dogValues("keep_in")
-        )
+        Doggo(dogValues, dateFormat)
     }
 
-    doggos.foreach { pet =>
-        println(s"ID: ${pet.id}")
-        println(s"Name: ${pet.name}")
-        println(s"Age: ${pet.age}")
-        println(s"Date found: ${pet.dateFound}")
-    }
+    // Filter and print doggos with breed "Labrador Retriever"
+    val labradorDoggos: List[Doggo] = filterByBreed(doggos, "Labrador Retriever")
+    printDoggos(labradorDoggos)
 
-    val doggosWithoutName = doggos.count(doggo => doggo.name.equals(""))
+    val labradorCount: Int = labradorDoggos.size
+    println(s"Number of Labrador Retrievers: $labradorCount")
+
+
+
+    val doggosWithoutName = doggos.count(_.name.isEmpty)
     val totalDoggos = doggos.size
 
     println(s"Amount of dogs without name: $doggosWithoutName out of $totalDoggos")
+}
+
+def filterByBreed(doggos: List[Doggo], breed: String): List[Doggo] = {
+  doggos.filter(_.breed == breed)
+}
+
+def printDoggos(doggos: List[Doggo]): Unit = {
+  doggos.foreach { pet =>
+    println(s"ID: ${pet.id}")
+    println(s"Name: ${pet.name}")
+    println(s"Age: ${pet.age}")
+    println(s"Breed: ${pet.breed}")
+    println(s"Date found: ${pet.dateFound}")
+    println()
+  }
 }
