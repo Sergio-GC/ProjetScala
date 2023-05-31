@@ -4,6 +4,7 @@ import com.github.tototoshi.csv._
 import java.io.File
 import java.util.Date
 import java.text.SimpleDateFormat
+import scala.collection.MapView
 
 // Define traits or abstract classes for common properties
 trait Animal {
@@ -89,16 +90,42 @@ object Doggo {
         Doggo(dogValues, dateFormat)
     }
 
-    // Filter and print doggos with breed "Labrador Retriever"
+    // 1 - Filter and print doggos with breed "Labrador Retriever"
     val labradorDoggos: List[Doggo] = filterByBreed(doggos, "Labrador Retriever")
     printDoggos(labradorDoggos)
 
     val labradorCount: Int = labradorDoggos.size
-    println(s"Number of Labrador Retrievers: $labradorCount")
+    println(s"Number of Labrador Retrievers: $labradorCount \n")
 
+    // 2 - Calculate the average age of all doggos
+    val totalAge: Double = doggos.map(_.age).sum
+    val averageAge: Double = totalAge / doggos.size
 
+    println(s"Average age of all doggos: $averageAge \n")
 
-    val doggosWithoutName = doggos.count(_.name.isEmpty)
+    // 3 - Group doggos by breed and count the number of doggos in each breed
+    val doggosByBreed: Map[String, List[Doggo]] = doggos.groupBy(_.breed)
+    val doggoCountByBreed: MapView[String, Int] = doggosByBreed.mapValues(_.size)
+
+    doggoCountByBreed.foreach { case (breed, count) =>
+      println(s"Breed: $breed - Count: $count")
+    }
+
+    // 4 - Find the oldest doggo
+    val oldestDoggo: Option[Doggo] = doggos.maxByOption(_.age)
+
+    oldestDoggo.foreach { doggo =>
+      println("\nDetails of the oldest doggo:")
+      println(s"ID: ${doggo.id}")
+      println(s"Name: ${doggo.name}")
+      println(s"Age: ${doggo.age}")
+      println(s"Breed: ${doggo.breed}\n")
+    }
+
+     // 5 - Extract the names of all doggos and print the count of doggos without name
+    val doggoNames: List[String] = doggos.map(_.name)
+
+    val doggosWithoutName = doggoNames.count(_.isEmpty)
     val totalDoggos = doggos.size
 
     println(s"Amount of dogs without name: $doggosWithoutName out of $totalDoggos")
