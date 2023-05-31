@@ -129,6 +129,50 @@ object Doggo {
     val totalDoggos = doggos.size
 
     println(s"Amount of dogs without name: $doggosWithoutName out of $totalDoggos")
+
+    val goldenDoggos = findDoggosByColor(doggos = doggos, color = "golden")
+    val nbGolden = goldenDoggos.size
+    println(s"Golden doggos: ${nbGolden}")
+
+    println(s"Is every dog neutered? : ${areAllDoggosNeutered(doggos = doggos)}")
+    println(s"Average age of Labrador Retrievers : ${calculateAvgAgeByBreed(doggos = doggos, breed = "Labrador Retriever")} years")
+}
+
+/**
+  * Find dogs of a given color.
+  *
+  * @param doggos List of dogs where it should look for the given color
+  * @param color Color to look for in the list of dogs
+  * @return List of dogs of the given color
+  */
+def findDoggosByColor(doggos: List[Doggo], color: String): List[Doggo] = {
+  doggos.filter(_.color == color)
+}
+
+/**
+  * Checks if every dog in a list is neutered
+  *
+  * @param doggos List of dogs
+  * @return Boolean --> True if every dog in the list has been neutered, false otherwise
+  */
+def areAllDoggosNeutered(doggos: List[Doggo]): Boolean = {
+  doggos.forall(_.neutered)
+}
+
+/**
+  * Calculate average for a given breed
+  *
+  * @param doggos List of dogs
+  * @param breed Breed to look for
+  * @return Average age of every dog of the given breed
+  */
+def calculateAvgAgeByBreed(doggos: List[Doggo], breed: String): Double = {
+  val totalAge = doggos
+    .filter(_.breed == breed)
+    .map(_.age)
+    .sum
+
+    totalAge / doggos.size
 }
 
 def filterByBreed(doggos: List[Doggo], breed: String): List[Doggo] = {
